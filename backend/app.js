@@ -15,11 +15,11 @@ app.use("/api", processRoutes);
 
 const __dirname = path.resolve();
 
-// Serve frontend
+// Serve frontend static files
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-// Handle React routing
-app.get("/*", (req, res) => {
+// Catch-all fallback (NO route pattern)
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
 });
 
