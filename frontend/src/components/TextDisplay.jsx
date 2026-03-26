@@ -10,6 +10,15 @@ const posColors = {
 };
 
 const TextDisplay = ({ tokens, activePOS }) => {
+  // ✅ Prevent crash
+  if (!tokens || tokens.length === 0) {
+    return (
+      <p style={{ textAlign: "center", marginTop: "20px" }}>
+        No data to display
+      </p>
+    );
+  }
+
   return (
     <div
       style={{
@@ -21,7 +30,7 @@ const TextDisplay = ({ tokens, activePOS }) => {
         backgroundColor: "#ffffff",
       }}
     >
-      {tokens.map((token, index) => {
+      {(tokens || []).map((token, index) => {
         const isActive =
           activePOS === "ALL" || token.pos === activePOS;
 

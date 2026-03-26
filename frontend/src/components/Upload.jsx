@@ -1,12 +1,14 @@
 import { useState } from "react";
-import axios from "axios";
 
 const Upload = ({ setTokens }) => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleUpload = async () => {
-    if (!file) return alert("Select an image");
+    if (!file) {
+      alert("Please select an image");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("image", file);
@@ -14,45 +16,52 @@ const Upload = ({ setTokens }) => {
     try {
       setLoading(true);
 
-      const res = await axios.post(
-        import.meta.env.VITE_API_URL + "/api/process",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      console.log(res.data.tokens);
-      setTokens(res.data.tokens);
+      // ✅ IMPORTANT: use relative path (NOT localhost)
+      const res = await fetch("/api/process", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      console.log("API RESPONSE:", data); // 🔍 debug
+
+      // ✅ Ensure tokens is always an array
+      if (Array.isArray(data)) {
+        setTokens(data);
+      } else if (data.tokens) {
+        setTokens(data.tokens);
+      } else {
+        setTokens([]);
+      }
+
     } catch (err) {
-      console.error(err);
-      alert("Upload failed");
+      console.error("Upload Error:", err);
+      setTokens([]); // prevent crash
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ textAlign: "center", marginBottom: "20px" }}>
+    <div style={{ textAlign: "center", marginTop: "20px" }}>
       <input
         type="file"
+        accept="image/*"
         onChange={(e) => setFile(e.target.files[0])}
-        style={{ marginBottom: "10px" }}
       />
-  
-      <br />
-  
+
+      <br /><br />
+
       <button
         onClick={handleUpload}
         style={{
           padding: "10px 20px",
+          borderRadius: "8px",
+          border: "none",
           backgroundColor: "#3498db",
           color: "white",
-          border: "none",
-          borderRadius: "6px",
           cursor: "pointer",
-          fontWeight: "bold",
         }}
       >
         {loading ? "Processing..." : "Upload"}
