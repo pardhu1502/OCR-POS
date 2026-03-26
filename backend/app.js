@@ -13,12 +13,12 @@ app.use("/api", processRoutes);
 
 const __dirname = path.resolve();
 
-//  Serve frontend static files
-app.use(express.static(path.join(__dirname, "../frontend/dist")));
+const frontendPath = path.join(__dirname, "frontend/dist");
 
-//  Catch-all (serves React app)
+app.use(express.static(frontendPath));
+
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+  res.sendFile(path.join(frontendPath, "index.html"));
 });
 
 const PORT = process.env.PORT || 5000;
