@@ -39,6 +39,7 @@ A full-stack web application that extracts text from images using OCR and perfor
 ---
 
 ## 🏗️ Project Structure
+```
 OCR-POS/
 │
 ├── backend/
@@ -61,7 +62,7 @@ OCR-POS/
 │ └── package.json
 │
 └── package.json
-
+```
 
 ---
 
