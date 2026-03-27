@@ -29,32 +29,39 @@ export const processImage = async (req, res) => {
 
     const doc = nlp(text);
 
-    const terms = doc.terms().data();
+    const words = text.split(/\s+/).filter(Boolean);
 
-    const tokens = terms.map((term) => {
-      const word = term.text || "";
-      const tags = term.tags || [];
+    // ✅ Precompute POS sets
+    const nounSet = new Set(doc.match("#Noun").out("array"));
+    const verbSet = new Set(doc.match("#Verb").out("array"));
+    const adjSet = new Set(doc.match("#Adjective").out("array"));
+    const advSet = new Set(doc.match("#Adverb").out("array"));
+    const pronSet = new Set(doc.match("#Pronoun").out("array"));
+    const detSet = new Set(doc.match("#Determiner").out("array"));
+    const conjSet = new Set(doc.match("#Conjunction").out("array"));
+    const adpSet = new Set(doc.match("#Preposition").out("array"));
 
+    const tokens = words.map((word) => {
       let pos = "X";
 
-      if (tags.includes("Noun")) pos = "NOUN";
-      else if (tags.includes("Verb")) pos = "VERB";
-      else if (tags.includes("Adjective")) pos = "ADJ";
-      else if (tags.includes("Adverb")) pos = "ADV";
-      else if (tags.includes("Pronoun")) pos = "PRON";
-      else if (tags.includes("Determiner")) pos = "DET";
-      else if (tags.includes("Conjunction")) pos = "CONJ";
-      else if (tags.includes("Preposition")) pos = "ADP";
+      if (nounSet.has(word)) pos = "NOUN";
+      else if (verbSet.has(word)) pos = "VERB";
+      else if (adjSet.has(word)) pos = "ADJ";
+      else if (advSet.has(word)) pos = "ADV";
+      else if (pronSet.has(word)) pos = "PRON";
+      else if (detSet.has(word)) pos = "DET";
+      else if (conjSet.has(word)) pos = "CONJ";
+      else if (adpSet.has(word)) pos = "ADP";
 
       return { word, pos };
     });
 
-    console.log("Tokens:", tokens);
+    console.log("✅ Tokens:", tokens);
 
     res.json(tokens);
 
   } catch (error) {
-    console.error("PROCESS ERROR:", error);
+    console.error("❌ PROCESS ERROR:", error);
 
     res.status(500).json({
       error: "Processing failed",
