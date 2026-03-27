@@ -17,19 +17,19 @@ export const processImage = async (req, res) => {
       }
     );
 
-    const text = result.data.text;
+    let text = result.data.text;
 
     console.log("📝 Extracted Text:", text);
 
-    const cleanedText = text.replace(/\n/g, " ").trim();
+    text = text.replace(/\n/g, " ").replace(/[^\w\s']/g, "");
 
-    const doc = nlp(cleanedText);
-    const terms = doc.terms().json();
+    const doc = nlp(text);
 
-    const tokens = terms.map((term) => {
-      const word = term.text;
+    const tagged = doc.out("tags");
 
-      const tags = term.tags || [];
+    const tokens = tagged.map((item) => {
+      const word = item.text;
+      const tags = item.tags || [];
 
       let pos = "X";
 
@@ -45,12 +45,12 @@ export const processImage = async (req, res) => {
       return { word, pos };
     });
 
-    console.log("Tokens:", tokens);
+    console.log(" Tokens:", tokens);
 
     res.json(tokens);
 
   } catch (error) {
-    console.error("PROCESS ERROR:", error);
+    console.error(" PROCESS ERROR:", error);
 
     res.status(500).json({
       error: "Processing failed",
