@@ -16,17 +16,27 @@ const Upload = ({ setTokens }) => {
     try {
       setLoading(true);
 
-      // ✅ IMPORTANT: use relative path (NOT localhost)
-      const res = await fetch("/api/process", {
+      const res = await fetch("https://ocr-pos.onrender.com/api/process", {
         method: "POST",
         body: formData,
       });
 
-      const data = await res.json();
+      console.log("STATUS:", res.status);
 
-      console.log("API RESPONSE:", data); // 🔍 debug
+      const text = await res.text();
+      console.log("RAW RESPONSE:", text);
 
-      // ✅ Ensure tokens is always an array
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (err) {
+        console.error("Not JSON response");
+        setTokens([]);
+        return;
+      }
+
+      console.log("PARSED DATA:", data);
+
       if (Array.isArray(data)) {
         setTokens(data);
       } else if (data.tokens) {
@@ -37,7 +47,7 @@ const Upload = ({ setTokens }) => {
 
     } catch (err) {
       console.error("Upload Error:", err);
-      setTokens([]); // prevent crash
+      setTokens([]); 
     } finally {
       setLoading(false);
     }
