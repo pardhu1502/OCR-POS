@@ -24,12 +24,12 @@ export const processImage = async (req, res) => {
     const cleanedText = text.replace(/\n/g, " ").trim();
 
     const doc = nlp(cleanedText);
-
     const terms = doc.terms().json();
 
     const tokens = terms.map((term) => {
       const word = term.text;
-      const tags = term.tags;
+
+      const tags = term.tags || [];
 
       let pos = "X";
 
@@ -42,18 +42,15 @@ export const processImage = async (req, res) => {
       else if (tags.includes("Conjunction")) pos = "CONJ";
       else if (tags.includes("Preposition")) pos = "ADP";
 
-      return {
-        word,
-        pos,
-      };
+      return { word, pos };
     });
 
-    console.log(" Tokens:", tokens);
+    console.log("Tokens:", tokens);
 
     res.json(tokens);
 
   } catch (error) {
-    console.error(" PROCESS ERROR:", error);
+    console.error("PROCESS ERROR:", error);
 
     res.status(500).json({
       error: "Processing failed",
